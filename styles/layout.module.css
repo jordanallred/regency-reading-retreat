@@ -1,0 +1,43 @@
+.navLinks li a {
+    color: #3a3a3a;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.navLinks li a:hover {
+    color: #9b2226;
+}
+
+.signupButton {
+    background-color: #9b2226;
+    color: white !important;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+}
+
+.signupButton:hover {
+    background-color: #7a1a1e;
+}
+
+.footer {
+    margin-top: auto;
+    padding: 1.5rem;
+    text-align: center;
+    background-color: #f4e9d9;
+    border-top: 1px solid #e5e5e5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .nav {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .navLinks {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+}

@@ -1,0 +1,187 @@
+.container {
+    min-height: 100vh;
+    padding: 0;
+    font-family: 'Lora', serif;
+    background-color: #f9f3e9;
+    color: #3a3a3a;
+}
+
+.main {
+    padding: 0;
+}
+
+.hero {
+    padding: 4rem 2rem;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    color: #fff;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+.hero > * {
+    position: relative;
+    z-index: 2;
+}
+
+.title {
+    margin: 0;
+    line-height: 1.15;
+    font-size: 4rem;
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 1rem;
+}
+
+.description {
+    line-height: 1.5;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.cta {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.primaryButton,
+.secondaryButton {
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.primaryButton {
+    background-color: #9b2226;
+    color: white;
+    border: none;
+}
+
+.secondaryButton {
+    background-color: transparent;
+    color: white;
+    border: 1px solid white;
+}
+
+.primaryButton:hover {
+    background-color: #7a1a1e;
+}
+
+.secondaryButton:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.infoSection,
+.teamSection,
+.rulesSection {
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.infoSection h2,
+.teamSection h2,
+.rulesSection h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: #9b2226;
+}
+
+.infoSection p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto 1rem;
+}
+
+.teamGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.teamCard {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.teamCard:hover {
+    transform: translateY(-5px);
+}
+
+.teamCard h3 {
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 1rem;
+    color: #9b2226;
+}
+
+.rulesList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.ruleItem {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ruleItem h3 {
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 1rem;
+    color: #9b2226;
+}
+
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    border-top: 1px solid #e5e5e5;
+    background-color: #f4e9d9;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .title {
+        font-size: 3rem;
+    }
+
+    .description {
+        font-size: 1.2rem;
+    }
+
+    .cta {
+        flex-direction: column;
+    }
+
+    .infoSection h2,
+    .teamSection h2,
+    .rulesSection h2 {
+        font-size: 2rem;
+    }
+}
