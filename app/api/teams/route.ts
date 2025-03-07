@@ -12,13 +12,8 @@ export async function GET(request: NextRequest) {
                 where: {
                     code: code
                 },
+                // Removing the 'users' include that's causing errors
                 include: {
-                    users: {
-                        select: {
-                            id: true,
-                            name: true
-                        }
-                    },
                     _count: {
                         select: {
                             scandals: true
@@ -59,10 +54,35 @@ export async function GET(request: NextRequest) {
                         description: 'Celebrated for wit, wisdom, and literary discussions',
                         goal: 100,
                         progress: 24,
-                        users: [],
                         _count: { scandals: 2 }
                     },
-                    // Add other mock teams here...
+                    {
+                        id: '2',
+                        name: 'The Bridgerton Circle',
+                        code: 'bridgerton',
+                        description: 'Known for their love of romance and society gossip',
+                        goal: 100,
+                        progress: 18,
+                        _count: { scandals: 1 }
+                    },
+                    {
+                        id: '3',
+                        name: 'The Shelley Soirée',
+                        code: 'shelley',
+                        description: 'Drawn to the gothic and revolutionary literature',
+                        goal: 100,
+                        progress: 15,
+                        _count: { scandals: 3 }
+                    },
+                    {
+                        id: '4',
+                        name: 'The Byron Society',
+                        code: 'byron',
+                        description: 'Passionate, dramatic, and always seeking adventure',
+                        goal: 100,
+                        progress: 20,
+                        _count: { scandals: 4 }
+                    }
                 ]
             });
         }
@@ -70,17 +90,10 @@ export async function GET(request: NextRequest) {
         // If teams exist, get real data
         const teams = await prisma.team.findMany({
             orderBy: {
-                // FIX: Use 'progress' instead of 'booksRead'
                 progress: 'desc'
-                // If you want to sort by booksRead, you'll need to add it to your schema
             },
+            // Removing the 'users' include that's causing errors
             include: {
-                users: {
-                    select: {
-                        id: true,
-                        name: true
-                    }
-                },
                 _count: {
                     select: {
                         scandals: true
@@ -128,7 +141,8 @@ export async function POST(request: NextRequest) {
                 name: body.name,
                 code: body.code,
                 description: body.description || '',
-                goal: body.goal || 100
+                goal: body.goal || 100,
+                progress: 0  // Initialize progress to 0
             }
         });
 

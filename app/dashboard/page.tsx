@@ -1,420 +1,178 @@
-'use client';
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
-import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import styles from '@/styles/dashboard.module.css';
-import { Book, Scandal, Team } from '@/types';
+export async function GET(request: NextRequest) {
+    const searchParams = request.nextUrl.searchParams;
+    const userId = searchParams.get('userId');
+    const teamId = searchParams.get('teamId');
+    const genre = searchParams.get('genre');
 
-interface NewBookForm {
-    title: string;
-    author: string;
-    pages: string;
-    genre: string;
-    dateFinished: string;
-}
-
-interface UserData {
-    name: string;
-    team: string;
-    booksRead: Book[];
-    currentScandal: Scandal | null;
-}
-
-export default function Dashboard() {
-    const { data: session, status } = useSession();
-    const router = useRouter();
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState('');
-
-    // User and team data states
-    const [userData, setUserData] = useState<UserData>({
-        name: '',
-        team: '',
-        booksRead: [],
-        currentScandal: null
-    });
-    const [teams, setTeams] = useState<Team[]>([]);
-    const [userTeam, setUserTeam] = useState<Team | null>(null);
-
-    // New book form state
-    const [newBook, setNewBook] = useState<NewBookForm>({
-        title: '',
-        author: '',
-        pages: '',
-        genre: 'regency',
-        dateFinished: ''
-    });
-
-    // Redirect if not authenticated
-    useEffect(() => {
-        if (status === 'unauthenticated') {
-            router.push('/login');
-        }
-    }, [status, router]);
-
-    // Fetch user data and books
-    useEffect(() => {
-        if (status === 'authenticated' && session?.user) {
-            fetchUserData();
-            fetchTeams();
-        }
-    }, [status, session]);
-
-    const fetchUserData = async () => {
+    // Handle specific queries
+    if (userId) {
         try {
-            setIsLoading(true);
-
-            // Fetch user's books
-            const booksResponse = await fetch('/api/books');
-            if (!booksResponse.ok) {
-                throw new Error('Failed to fetch books');
-            }
-            const booksData = await booksResponse.json();
-
-            // Fetch user's current scandal if any
-            const scandalResponse = await fetch('/api/scandals/current');
-            const scandalData = await scandalResponse.json();
-
-            setUserData({
-                name: session?.user?.name || 'Reader',
-                team: session?.user?.team || '',
-                booksRead: booksData.books || [],
-                currentScandal: scandalData.scandal || null
-            });
-
-        } catch (err) {
-            console.error('Error fetching user data:', err);
-            setError('Failed to load your reading data. Please try again.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const fetchTeams = async () => {
-        try {
-            const response = await fetch('/api/teams');
-            if (!response.ok) {
-                throw new Error('Failed to fetch teams');
-            }
-            const data = await response.json();
-            setTeams(data.teams || []);
-
-            // Find user's team
-            if (session?.user?.team) {
-                const team = data.teams.find((t: Team) => t.code === session.user.team);
-                if (team) {
-                    setUserTeam(team);
-                }
-            }
-        } catch (err) {
-            console.error('Error fetching teams:', err);
-        }
-    };
-
-    const handleBookChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setNewBook({
-            ...newBook,
-            [e.target.name]: e.target.value
-        });
-    };
-
-    const addBook = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        // Validate form
-        if (!newBook.title || !newBook.author || !newBook.pages || !newBook.dateFinished) {
-            return;
-        }
-
-        const bookWithTypedPages: Book = {
-            ...newBook,
-            pages: parseInt(newBook.pages, 10)
-        };
-
-        try {
-            // Send data to the API
-            const response = await fetch('/api/books', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+            const books = await prisma.book.findMany({
+                where: {
+                    userId: userId
                 },
-                body: JSON.stringify({
-                    ...bookWithTypedPages,
-                    userId: session?.user?.id, // Use the actual user ID from session
-                    teamId: userTeam?.id || null, // Use actual team ID or null
-                }),
+                orderBy: {
+                    dateFinished: 'desc'
+                }
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Error adding book:', errorData);
-                return;
-            }
-
-            // After successful API call, update local state
-            const updatedUserData = {
-                ...userData,
-                booksRead: [...userData.booksRead, bookWithTypedPages]
-            };
-
-            // Check for scandal
-            const scandal = checkForScandal(userData.booksRead, bookWithTypedPages);
-            if (scandal) {
-                updatedUserData.currentScandal = scandal;
-            }
-
-            setUserData(updatedUserData);
-
-            // Reset form
-            setNewBook({
-                title: '',
-                author: '',
-                pages: '',
-                genre: 'regency',
-                dateFinished: ''
-            });
+            return NextResponse.json({ books });
         } catch (error) {
-            console.error('Error adding book:', error);
+            console.error('Error fetching user books:', error);
+            return NextResponse.json(
+                { error: 'Failed to fetch user books' },
+                { status: 500 }
+            );
         }
-    };
-
-    const dismissScandal = async () => {
-        if (!userData.currentScandal) return;
-
-        try {
-            const response = await fetch(`/api/scandals/${userData.currentScandal.id}/acknowledge`, {
-                method: 'POST'
-            });
-
-            if (response.ok) {
-                setUserData({
-                    ...userData,
-                    currentScandal: null
-                });
-            }
-        } catch (err) {
-            console.error('Error acknowledging scandal:', err);
-        }
-    };
-
-    const deleteBook = async (bookId: string) => {
-        try {
-            const response = await fetch(`/api/books/${bookId}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                // Remove book from list
-                setUserData({
-                    ...userData,
-                    booksRead: userData.booksRead.filter(book => book.id !== bookId)
-                });
-
-                // Refresh teams data
-                fetchTeams();
-            }
-        } catch (err) {
-            console.error('Error deleting book:', err);
-            setError('Failed to delete book. Please try again.');
-        }
-    };
-
-    if (status === 'loading' || isLoading) {
-        return (
-            <div className={styles.container}>
-                <main className={styles.main}>
-                    <div className={styles.loading}>
-                        Loading your reading salon...
-                    </div>
-                </main>
-            </div>
-        );
     }
 
-    return (
-        <div className={styles.container}>
-            <main className={styles.main}>
-                <div className={styles.header}>
-                    <h1>Welcome to the Season, {userData.name}</h1>
-                    <p>Society: {userTeam?.name || 'Loading...'}</p>
-                </div>
+    if (teamId) {
+        try {
+            const books = await prisma.book.findMany({
+                where: {
+                    user: {
+                        teamId: teamId
+                    }
+                },
+                orderBy: {
+                    dateFinished: 'desc'
+                },
+                include: {
+                    user: {
+                        select: {
+                            name: true
+                        }
+                    }
+                }
+            });
 
-                {error && (
-                    <div className={styles.error}>
-                        {error}
-                    </div>
-                )}
+            return NextResponse.json({ books });
+        } catch (error) {
+            console.error('Error fetching team books:', error);
+            return NextResponse.json(
+                { error: 'Failed to fetch team books' },
+                { status: 500 }
+            );
+        }
+    }
 
-                {userData.currentScandal && (
-                    <div className={styles.scandalAlert}>
-                        <h2>⚠️ Scandal Alert! ⚠️</h2>
-                        <h3>{userData.currentScandal.title}</h3>
-                        <p>{userData.currentScandal.description}</p>
-                        <div className={styles.challenge}>
-                            <span>Challenge:</span> {userData.currentScandal.challenge}
-                        </div>
-                        <button
-                            className={styles.dismissButton}
-                            onClick={dismissScandal}
-                        >
-                            Accept Challenge
-                        </button>
-                    </div>
-                )}
+    if (genre) {
+        try {
+            const books = await prisma.book.findMany({
+                where: {
+                    genre: genre
+                },
+                orderBy: {
+                    dateFinished: 'desc'
+                }
+            });
 
-                <div className={styles.dashboardGrid}>
-                    <section className={styles.teamProgress}>
-                        <h2>Society Progress</h2>
-                        <div className={styles.progressBar}>
-                            <div
-                                className={styles.progressFill}
-                                style={{
-                                    width: userTeam
-                                        ? `${(userTeam.progress / userTeam.goal) * 100}%`
-                                        : '0%'
-                                }}
-                            ></div>
-                        </div>
-                        <p>{userTeam?.progress || 0} / {userTeam?.goal || 100} books</p>
-                    </section>
+            return NextResponse.json({ books });
+        } catch (error) {
+            console.error('Error fetching books by genre:', error);
+            return NextResponse.json(
+                { error: 'Failed to fetch books by genre' },
+                { status: 500 }
+            );
+        }
+    }
 
-                    <section className={styles.readingLog}>
-                        <h2>Your Reading Card</h2>
-                        <form onSubmit={addBook} className={styles.addBookForm}>
-                            <div className={styles.formGrid}>
-                                <div className={styles.formGroup}>
-                                    <label htmlFor="title">Book Title</label>
-                                    <input
-                                        type="text"
-                                        id="title"
-                                        name="title"
-                                        value={newBook.title}
-                                        onChange={handleBookChange}
-                                        required
-                                    />
-                                </div>
+    // Default: return all books
+    try {
+        const books = await prisma.book.findMany({
+            orderBy: {
+                dateFinished: 'desc'
+            }
+        });
 
-                                <div className={styles.formGroup}>
-                                    <label htmlFor="author">Author</label>
-                                    <input
-                                        type="text"
-                                        id="author"
-                                        name="author"
-                                        value={newBook.author}
-                                        onChange={handleBookChange}
-                                        required
-                                    />
-                                </div>
+        return NextResponse.json({ books });
+    } catch (error) {
+        console.error('Error fetching books:', error);
+        return NextResponse.json(
+            { error: 'Failed to fetch books' },
+            { status: 500 }
+        );
+    }
+}
 
-                                <div className={styles.formGroup}>
-                                    <label htmlFor="pages">Page Count</label>
-                                    <input
-                                        type="number"
-                                        id="pages"
-                                        name="pages"
-                                        min="1"
-                                        value={newBook.pages}
-                                        onChange={handleBookChange}
-                                        required
-                                    />
-                                </div>
+export async function POST(request: NextRequest) {
+    try {
+        const body = await request.json();
 
-                                <div className={styles.formGroup}>
-                                    <label htmlFor="genre">Genre</label>
-                                    <select
-                                        id="genre"
-                                        name="genre"
-                                        value={newBook.genre}
-                                        onChange={handleBookChange}
-                                        required
-                                    >
-                                        <option value="regency">Regency Romance</option>
-                                        <option value="historical">Historical Fiction</option>
-                                        <option value="classic">Classic Literature</option>
-                                        <option value="gothic">Gothic</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
+        console.log('Received book data:', body);
 
-                                <div className={styles.formGroup}>
-                                    <label htmlFor="dateFinished">Date Finished</label>
-                                    <input
-                                        type="date"
-                                        id="dateFinished"
-                                        name="dateFinished"
-                                        value={newBook.dateFinished}
-                                        onChange={handleBookChange}
-                                        required
-                                    />
-                                </div>
-                            </div>
+        // Validate required fields
+        if (!body.title || !body.author || !body.userId) {
+            console.log('Missing required fields:', {
+                title: body.title,
+                author: body.author,
+                userId: body.userId
+            });
 
-                            <button
-                                type="submit"
-                                className={styles.addButton}
-                                disabled={isLoading}
-                            >
-                                {isLoading ? 'Adding...' : 'Add to Reading Card'}
-                            </button>
-                        </form>
+            return NextResponse.json(
+                { error: 'Missing required fields' },
+                { status: 400 }
+            );
+        }
 
-                        <div className={styles.bookList}>
-                            <h3>Books You've Read</h3>
-                            {userData.booksRead.length === 0 ? (
-                                <p className={styles.emptyState}>Your reading card awaits its first entry</p>
-                            ) : (
-                                <ul>
-                                    {userData.booksRead.map((book) => (
-                                        <li key={book.id} className={styles.bookItem}>
-                                            <div className={styles.bookTitle}>{book.title}</div>
-                                            <div className={styles.bookAuthor}>by {book.author}</div>
-                                            <div className={styles.bookDetails}>
-                                                {book.pages} pages • {book.genre}
-                                            </div>
-                                            <button
-                                                onClick={() => deleteBook(book.id)}
-                                                className={styles.deleteButton}
-                                                aria-label="Delete book"
-                                            >
-                                                ×
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                    </section>
+        // Ensure pages is a number
+        const pages = typeof body.pages === 'number' ? body.pages :
+            (body.pages ? parseInt(body.pages, 10) : 0);
 
-                    <section className={styles.leaderboard}>
-                        <h2>Society Standings</h2>
-                        <table className={styles.standingsTable}>
-                            <thead>
-                            <tr>
-                                <th>Society</th>
-                                <th>Books Read</th>
-                                <th>Scandals</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {teams.length > 0 ? (
-                                teams.map((team) => (
-                                    <tr key={team.id} className={team.code === userData.team ? styles.userTeam : ''}>
-                                        <td>{team.name}</td>
-                                        <td>{team.progress}</td>
-                                        <td>{team.scandals}</td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={3}>Loading society data...</td>
-                                </tr>
-                            )}
-                            </tbody>
-                        </table>
-                    </section>
-                </div>
-            </main>
-        </div>
-    );
+        // If dateFinished is not provided or invalid, use current date
+        let dateFinished;
+        try {
+            dateFinished = body.dateFinished ? new Date(body.dateFinished).toISOString() : new Date().toISOString();
+        } catch (e) {
+            dateFinished = new Date().toISOString();
+        }
+
+        const bookData = {
+            title: body.title,
+            author: body.author,
+            pages: pages,
+            genre: body.genre || 'unknown',
+            dateFinished: dateFinished,
+            userId: body.userId
+        };
+
+        console.log('Creating book with data:', bookData);
+
+        const book = await prisma.book.create({
+            data: bookData
+        });
+
+        // Find user's team and update team progress if applicable
+        try {
+            const user = await prisma.user.findUnique({
+                where: { id: body.userId },
+                select: { team: true }
+            });
+
+            if (user?.team) {
+                await prisma.team.update({
+                    where: { code: user.team },
+                    data: {
+                        progress: {
+                            increment: 1
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error updating team progress:', error);
+            // Continue even if team update fails
+        }
+
+        return NextResponse.json({ book }, { status: 201 });
+    } catch (error) {
+        console.error('Error creating book:', error);
+        return NextResponse.json(
+            { error: 'Failed to create book' },
+            { status: 500 }
+        );
+    }
 }

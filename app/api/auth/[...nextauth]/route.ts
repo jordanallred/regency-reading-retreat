@@ -46,21 +46,28 @@ export const authOptions: NextAuthOptions = {
             }
         })
     ],
+    debug: process.env.NODE_ENV === 'development', // Enable debug in development mode
     session: {
         strategy: "jwt"
     },
     callbacks: {
         async jwt({ token, user }) {
+            // When user logs in, add their data to the token
             if (user) {
                 token.id = user.id;
                 token.team = user.team;
+                // Log user data being added to the token
+                console.log("Adding user data to token:", { id: user.id, team: user.team });
             }
             return token;
         },
         async session({ session, token }) {
-            if (token) {
+            // Add custom properties to the session
+            if (token && session.user) {
                 session.user.id = token.id as string;
                 session.user.team = token.team as string;
+                // Log session data being constructed
+                console.log("Creating session with user data:", { id: token.id, team: token.team });
             }
             return session;
         }
@@ -72,6 +79,31 @@ export const authOptions: NextAuthOptions = {
     },
     secret: process.env.NEXTAUTH_SECRET
 };
+
+// Update types to make TypeScript recognize our custom properties
+declare module "next-auth" {
+    interface Session {
+        user: {
+            id: string;
+            name?: string | null;
+            email?: string | null;
+            image?: string | null;
+            team: string;
+        }
+    }
+
+    interface User {
+        id: string;
+        team: string;
+    }
+}
+
+declare module "next-auth/jwt" {
+    interface JWT {
+        id: string;
+        team: string;
+    }
+}
 
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
