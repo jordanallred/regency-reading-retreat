@@ -1,178 +1,363 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+'use client';
 
-export async function GET(request: NextRequest) {
-    const searchParams = request.nextUrl.searchParams;
-    const userId = searchParams.get('userId');
-    const teamId = searchParams.get('teamId');
-    const genre = searchParams.get('genre');
+import { useEffect, useState, FormEvent } from 'react';
+import { useSession } from 'next-auth/react';
+import { redirect } from 'next/navigation';
+import styles from '@/styles/dashboard.module.css';
 
-    // Handle specific queries
-    if (userId) {
-        try {
-            const books = await prisma.book.findMany({
-                where: {
-                    userId: userId
-                },
-                orderBy: {
-                    dateFinished: 'desc'
-                }
-            });
-
-            return NextResponse.json({ books });
-        } catch (error) {
-            console.error('Error fetching user books:', error);
-            return NextResponse.json(
-                { error: 'Failed to fetch user books' },
-                { status: 500 }
-            );
-        }
-    }
-
-    if (teamId) {
-        try {
-            const books = await prisma.book.findMany({
-                where: {
-                    user: {
-                        teamId: teamId
-                    }
-                },
-                orderBy: {
-                    dateFinished: 'desc'
-                },
-                include: {
-                    user: {
-                        select: {
-                            name: true
-                        }
-                    }
-                }
-            });
-
-            return NextResponse.json({ books });
-        } catch (error) {
-            console.error('Error fetching team books:', error);
-            return NextResponse.json(
-                { error: 'Failed to fetch team books' },
-                { status: 500 }
-            );
-        }
-    }
-
-    if (genre) {
-        try {
-            const books = await prisma.book.findMany({
-                where: {
-                    genre: genre
-                },
-                orderBy: {
-                    dateFinished: 'desc'
-                }
-            });
-
-            return NextResponse.json({ books });
-        } catch (error) {
-            console.error('Error fetching books by genre:', error);
-            return NextResponse.json(
-                { error: 'Failed to fetch books by genre' },
-                { status: 500 }
-            );
-        }
-    }
-
-    // Default: return all books
-    try {
-        const books = await prisma.book.findMany({
-            orderBy: {
-                dateFinished: 'desc'
-            }
-        });
-
-        return NextResponse.json({ books });
-    } catch (error) {
-        console.error('Error fetching books:', error);
-        return NextResponse.json(
-            { error: 'Failed to fetch books' },
-            { status: 500 }
-        );
-    }
+interface Book {
+    id: string;
+    title: string;
+    author: string;
+    pages: number;
+    genre: string;
+    dateFinished: string;
 }
 
-export async function POST(request: NextRequest) {
-    try {
-        const body = await request.json();
+interface Team {
+    id: string;
+    name: string;
+    code: string;
+    description: string;
+    goal: number;
+    progress: number;
+}
 
-        console.log('Received book data:', body);
+interface Scandal {
+    id: string;
+    title: string;
+    description: string;
+    challenge: string;
+}
 
-        // Validate required fields
-        if (!body.title || !body.author || !body.userId) {
-            console.log('Missing required fields:', {
-                title: body.title,
-                author: body.author,
-                userId: body.userId
-            });
+interface BookFormData {
+    title: string;
+    author: string;
+    pages: string;
+    genre: string;
+}
 
-            return NextResponse.json(
-                { error: 'Missing required fields' },
-                { status: 400 }
-            );
+export default function Dashboard() {
+    const { data: session, status } = useSession();
+    const [books, setBooks] = useState<Book[]>([]);
+    const [team, setTeam] = useState<Team | null>(null);
+    const [activeScandal, setActiveScandal] = useState<Scandal | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
+    const [formError, setFormError] = useState('');
+
+    // Form state
+    const [bookForm, setBookForm] = useState<BookFormData>({
+        title: '',
+        author: '',
+        pages: '',
+        genre: ''
+    });
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setBookForm(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const fetchUserData = async () => {
+        if (!session?.user?.id) return;
+
+        try {
+            setLoading(true);
+
+            // Fetch user's books
+            const booksResponse = await fetch(`/api/books?userId=${session.user.id}`);
+            const booksData = await booksResponse.json();
+
+            if (booksData.books) {
+                setBooks(booksData.books);
+            }
+
+            // Fetch user's team
+            if (session.user.team) {
+                const teamResponse = await fetch(`/api/teams?code=${session.user.team}`);
+                const teamData = await teamResponse.json();
+
+                if (teamData.team) {
+                    setTeam(teamData.team);
+                }
+            }
+
+            // Fetch user's active scandal
+            const scandalResponse = await fetch('/api/scandals/current');
+            const scandalData = await scandalResponse.json();
+
+            if (scandalData.scandal) {
+                setActiveScandal(scandalData.scandal);
+            }
+
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        // Redirect if not authenticated
+        if (status === 'unauthenticated') {
+            redirect('/login');
         }
 
-        // Ensure pages is a number
-        const pages = typeof body.pages === 'number' ? body.pages :
-            (body.pages ? parseInt(body.pages, 10) : 0);
+        // Fetch user's books and active scandal if authenticated
+        if (status === 'authenticated' && session?.user?.id) {
+            fetchUserData();
+        }
+    }, [session, status]);
 
-        // If dateFinished is not provided or invalid, use current date
-        let dateFinished;
-        try {
-            dateFinished = body.dateFinished ? new Date(body.dateFinished).toISOString() : new Date().toISOString();
-        } catch (e) {
-            dateFinished = new Date().toISOString();
+    const handleAddBook = async (e: FormEvent) => {
+        e.preventDefault();
+
+        if (!session?.user?.id) {
+            return;
         }
 
-        const bookData = {
-            title: body.title,
-            author: body.author,
-            pages: pages,
-            genre: body.genre || 'unknown',
-            dateFinished: dateFinished,
-            userId: body.userId
-        };
+        // Form validation
+        if (!bookForm.title.trim() || !bookForm.author.trim()) {
+            setFormError('Title and author are required');
+            return;
+        }
 
-        console.log('Creating book with data:', bookData);
+        setSubmitting(true);
+        setFormError('');
 
-        const book = await prisma.book.create({
-            data: bookData
-        });
-
-        // Find user's team and update team progress if applicable
         try {
-            const user = await prisma.user.findUnique({
-                where: { id: body.userId },
-                select: { team: true }
+            const response = await fetch('/api/books', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: bookForm.title,
+                    author: bookForm.author,
+                    pages: bookForm.pages ? parseInt(bookForm.pages) : 0,
+                    genre: bookForm.genre || 'unknown',
+                    userId: session.user.id,
+                    dateFinished: new Date().toISOString()
+                })
             });
 
-            if (user?.team) {
-                await prisma.team.update({
-                    where: { code: user.team },
-                    data: {
-                        progress: {
-                            increment: 1
-                        }
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to add book');
+            }
+
+            // Reset form
+            setBookForm({
+                title: '',
+                author: '',
+                pages: '',
+                genre: ''
+            });
+
+            // Refresh book list and team data
+            fetchUserData();
+
+        } catch (error) {
+            console.error('Error adding book:', error);
+            setFormError(error instanceof Error ? error.message : 'Error adding book');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const dismissScandal = async () => {
+        if (activeScandal?.id) {
+            try {
+                await fetch(`/api/scandals/${activeScandal.id}/acknowledge`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
                     }
                 });
+                setActiveScandal(null);
+            } catch (error) {
+                console.error('Error acknowledging scandal:', error);
             }
-        } catch (error) {
-            console.error('Error updating team progress:', error);
-            // Continue even if team update fails
         }
+    };
 
-        return NextResponse.json({ book }, { status: 201 });
-    } catch (error) {
-        console.error('Error creating book:', error);
-        return NextResponse.json(
-            { error: 'Failed to create book' },
-            { status: 500 }
+    if (status === 'loading' || loading) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.main}>
+                    <p>Loading your social season details...</p>
+                </div>
+            </div>
         );
     }
+
+    if (!session) {
+        return null; // Will redirect due to the useEffect
+    }
+
+    return (
+        <div className={styles.container}>
+            <div className={styles.main}>
+                {activeScandal && (
+                    <div className={styles.scandalAlert}>
+                        <h2>⚠️ Scandal Alert! ⚠️</h2>
+                        <h3>{activeScandal.title}</h3>
+                        <p>{activeScandal.description}</p>
+                        <div className={styles.challenge}>
+                            <span>Challenge:</span> {activeScandal.challenge}
+                        </div>
+                        <button
+                            className={styles.dismissButton}
+                            onClick={dismissScandal}
+                        >
+                            Accept Challenge
+                        </button>
+                    </div>
+                )}
+
+                <div className={styles.header}>
+                    <h1>Welcome to the Season, {session.user.name}</h1>
+                    {team && (
+                        <div>
+                            Member of <span>{team.name}</span>
+                        </div>
+                    )}
+                </div>
+
+                <div className={styles.dashboardGrid}>
+                    <section className={styles.teamProgress}>
+                        <h2>Your Reading Progress</h2>
+                        <div>
+                            <p>Books Read: {books.length}</p>
+                            {team && (
+                                <>
+                                    <div className={styles.progressBar}>
+                                        <div
+                                            className={styles.progressFill}
+                                            style={{ width: `${Math.min(100, (team.progress / team.goal) * 100)}%` }}
+                                        ></div>
+                                    </div>
+                                    <p>{team.progress} / {team.goal} Team Goal</p>
+                                </>
+                            )}
+                        </div>
+                    </section>
+
+                    <section className={styles.readingLog}>
+                        <h2>Your Reading Card</h2>
+
+                        <form className={styles.addBookForm} onSubmit={handleAddBook}>
+                            {formError && <div className={styles.error}>{formError}</div>}
+                            <div className={styles.formGrid}>
+                                <div className={styles.formGroup}>
+                                    <label htmlFor="title">Book Title</label>
+                                    <input
+                                        type="text"
+                                        id="title"
+                                        name="title"
+                                        placeholder="Pride and Prejudice"
+                                        value={bookForm.title}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label htmlFor="author">Author</label>
+                                    <input
+                                        type="text"
+                                        id="author"
+                                        name="author"
+                                        placeholder="Jane Austen"
+                                        value={bookForm.author}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label htmlFor="pages">Pages</label>
+                                    <input
+                                        type="number"
+                                        id="pages"
+                                        name="pages"
+                                        placeholder="279"
+                                        value={bookForm.pages}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label htmlFor="genre">Genre</label>
+                                    <select
+                                        id="genre"
+                                        name="genre"
+                                        value={bookForm.genre}
+                                        onChange={handleInputChange}
+                                    >
+                                        <option value="">Select a genre...</option>
+                                        <option value="classic">Classic</option>
+                                        <option value="romance">Romance</option>
+                                        <option value="historical">Historical</option>
+                                        <option value="gothic">Gothic</option>
+                                        <option value="poetry">Poetry</option>
+                                        <option value="drama">Drama</option>
+                                        <option value="non-fiction">Non-Fiction</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button
+                                className={styles.addButton}
+                                type="submit"
+                                disabled={submitting}
+                            >
+                                {submitting ? 'Adding...' : 'Add to Reading Card'}
+                            </button>
+                        </form>
+
+                        {books.length === 0 ? (
+                            <div className={styles.emptyState}>
+                                <p>You haven't added any books to your reading card yet.</p>
+                                <p>Start logging your Regency-era reads to contribute to your society's progress!</p>
+                            </div>
+                        ) : (
+                            <div className={styles.bookList}>
+                                <h3>Recent Books</h3>
+                                <ul>
+                                    {books.map((book) => (
+                                        <li key={book.id} className={styles.bookItem}>
+                                            <div className={styles.bookTitle}>{book.title}</div>
+                                            <div className={styles.bookAuthor}>by {book.author}</div>
+                                            <div className={styles.bookDetails}>
+                                                Genre: {book.genre} | {book.pages} pages |
+                                                Finished: {new Date(book.dateFinished).toLocaleDateString()}
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </section>
+
+                    {team && (
+                        <section className={styles.leaderboard}>
+                            <h2>Society Updates</h2>
+                            <div>
+                                <h3>{team.name}</h3>
+                                <p>{team.description}</p>
+                                <div className={styles.progressBar}>
+                                    <div
+                                        className={styles.progressFill}
+                                        style={{ width: `${Math.min(100, (team.progress / team.goal) * 100)}%` }}
+                                    ></div>
+                                </div>
+                                <p>{team.progress} / {team.goal} books read</p>
+                            </div>
+                        </section>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
 }

@@ -102,8 +102,6 @@ export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
 
-        console.log('Received book data:', body);
-
         // Validate required fields
         if (!body.title || !body.author || !body.userId) {
             console.log('Missing required fields:', {
@@ -138,8 +136,6 @@ export async function POST(request: NextRequest) {
             dateFinished: dateFinished,
             userId: body.userId
         };
-
-        console.log('Creating book with data:', bookData);
 
         const book = await prisma.book.create({
             data: bookData

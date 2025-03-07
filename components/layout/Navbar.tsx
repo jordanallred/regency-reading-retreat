@@ -48,7 +48,7 @@ export default function Navbar() {
                                 <li>
                                     <button
                                         onClick={() => signOut({ callbackUrl: '/' })}
-                                        className={styles.signOutButton}
+                                        className={`${styles.signupButton} ${styles.signOutButton}`}
                                     >
                                         Sign Out
                                     </button>

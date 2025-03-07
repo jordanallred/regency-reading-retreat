@@ -67,7 +67,6 @@ export const authOptions: NextAuthOptions = {
                 session.user.id = token.id as string;
                 session.user.team = token.team as string;
                 // Log session data being constructed
-                console.log("Creating session with user data:", { id: token.id, team: token.team });
             }
             return session;
         }

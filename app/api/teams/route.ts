@@ -11,15 +11,8 @@ export async function GET(request: NextRequest) {
             const team = await prisma.team.findUnique({
                 where: {
                     code: code
-                },
-                // Removing the 'users' include that's causing errors
-                include: {
-                    _count: {
-                        select: {
-                            scandals: true
-                        }
-                    }
                 }
+                // Remove the problematic _count include
             });
 
             if (!team) {
@@ -53,8 +46,7 @@ export async function GET(request: NextRequest) {
                         code: 'austen',
                         description: 'Celebrated for wit, wisdom, and literary discussions',
                         goal: 100,
-                        progress: 24,
-                        _count: { scandals: 2 }
+                        progress: 24
                     },
                     {
                         id: '2',
@@ -62,8 +54,7 @@ export async function GET(request: NextRequest) {
                         code: 'bridgerton',
                         description: 'Known for their love of romance and society gossip',
                         goal: 100,
-                        progress: 18,
-                        _count: { scandals: 1 }
+                        progress: 18
                     },
                     {
                         id: '3',
@@ -71,8 +62,7 @@ export async function GET(request: NextRequest) {
                         code: 'shelley',
                         description: 'Drawn to the gothic and revolutionary literature',
                         goal: 100,
-                        progress: 15,
-                        _count: { scandals: 3 }
+                        progress: 15
                     },
                     {
                         id: '4',
@@ -80,8 +70,7 @@ export async function GET(request: NextRequest) {
                         code: 'byron',
                         description: 'Passionate, dramatic, and always seeking adventure',
                         goal: 100,
-                        progress: 20,
-                        _count: { scandals: 4 }
+                        progress: 20
                     }
                 ]
             });
@@ -91,15 +80,8 @@ export async function GET(request: NextRequest) {
         const teams = await prisma.team.findMany({
             orderBy: {
                 progress: 'desc'
-            },
-            // Removing the 'users' include that's causing errors
-            include: {
-                _count: {
-                    select: {
-                        scandals: true
-                    }
-                }
             }
+            // Remove the problematic _count include
         });
 
         return NextResponse.json({ teams });
