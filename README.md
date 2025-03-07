@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Regency Reading Retreat
 
-## Getting Started
+A themed readathon application where participants join literary societies, log their reading progress, and navigate social scandals in a Regency-era inspired experience.
 
-First, run the development server:
+![Regency Reading Retreat](https://images.unsplash.com/photo-1524578271613-d550eacf6090?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 📚 Overview
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The Regency Reading Retreat is a web application designed to facilitate a themed readathon inspired by the social season of 19th century England. Users join one of four literary societies and collectively read books from or about the Regency era while avoiding scandals triggered by certain reading behaviors.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Key Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **User Authentication**: Sign up, login, and personalized user dashboards
+- **Society Teams**: Join one of four literary societies with unique characteristics
+- **Reading Logs**: Track completed books with details like title, author, page count, and genre
+- **Society Progress**: Monitor each society's collective reading progress
+- **Scandal System**: Certain reading behaviors may trigger scandals that create additional challenges
+- **Leaderboard**: Track society standings throughout the reading season
 
-## Learn More
+## 🛠️ Technologies Used
 
-To learn more about Next.js, take a look at the following resources:
+- **Frontend**: Next.js, React, TypeScript
+- **Styling**: CSS Modules with Regency-inspired design
+- **Authentication**: NextAuth.js
+- **Database**: PostgreSQL with Prisma ORM
+- **Deployment**: Vercel (recommended)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📋 Literary Societies
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Participants can choose to join one of four distinguished societies:
 
-## Deploy on Vercel
+1. **The Austen Assembly**: Celebrated for wit, wisdom, and literary discussions
+2. **The Bridgerton Circle**: Known for their love of romance and society gossip
+3. **The Shelley Soirée**: Drawn to the gothic and revolutionary literature
+4. **The Byron Society**: Passionate, dramatic, and always seeking adventure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔮 Scandals & Challenges
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Various reading behaviors may trigger scandals, presenting additional challenges for participants:
+
+- Reading too many short books
+- Reading too many books of a single genre
+- Reading multiple works by the same author in succession
+- Reading at a suspiciously rapid pace
+- Neglecting classic authors
+
+When triggered, scandals present thematic challenges that participants must overcome to maintain their society's reputation.
+
+## 🚀 Getting Started
+
+See the [Installation & Setup Guide](SETUP.md) for detailed instructions on how to deploy and run the application.
+
+## 👩‍💻 Contributing
+
+Contributions to enhance the Regency Reading Retreat are welcome! Please feel free to submit a pull request or open an issue to discuss potential improvements.
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgements
+
+- Jane Austen, for inspiring the Regency theme
+- BookTube and reading community, for the readathon concept
+- [Any specific book or reading community influencers to credit]
+
+---
+
+*"It is a truth universally acknowledged, that a book lover in possession of a TBR pile, must be in want of a readathon."* 📚

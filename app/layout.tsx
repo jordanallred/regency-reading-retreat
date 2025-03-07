@@ -1,6 +1,8 @@
+// app/layout.tsx
 import './globals.css';
 import { Lora, Playfair_Display } from 'next/font/google';
 import Navbar from '@/components/layout/Navbar';
+import AuthProvider from '@/components/providers/AuthProvider';
 import { Metadata } from 'next';
 
 // Define fonts
@@ -32,13 +34,15 @@ export default function RootLayout({
     return (
         <html lang="en" className={`${lora.variable} ${playfair.variable}`}>
         <body>
-        <div className="min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-grow">{children}</main>
-            <footer className="py-6 text-center bg-[#f4e9d9] border-t border-[#e5e5e5]">
-                <p>&copy; {new Date().getFullYear()} Regency Reading Retreat</p>
-            </footer>
-        </div>
+        <AuthProvider>
+            <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <main className="flex-grow">{children}</main>
+                <footer className="py-6 text-center bg-[#f4e9d9] border-t border-[#e5e5e5]">
+                    <p>&copy; {new Date().getFullYear()} Regency Reading Retreat</p>
+                </footer>
+            </div>
+        </AuthProvider>
         </body>
         </html>
     );

@@ -1,0 +1,117 @@
+/* styles/navbar.module.css */
+.header {
+    background-color: #f4e9d9;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logoLink {
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo {
+    font-family: var(--font-playfair);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: #5a3e36;
+}
+
+.navigation {
+    display: flex;
+    align-items: center;
+}
+
+.navList {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 1.5rem;
+}
+
+.navList li a {
+    font-family: var(--font-lora);
+    text-decoration: none;
+    color: #5a3e36;
+    font-size: 1rem;
+    transition: color 0.2s;
+    padding: 0.5rem 0;
+    position: relative;
+}
+
+.navList li a:hover,
+.active {
+    color: #a06c45 !important;
+}
+
+.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #a06c45;
+}
+
+.signupButton {
+    background-color: #a06c45;
+    color: white !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 4px;
+}
+
+.signupButton:hover {
+    background-color: #8a5a3b;
+}
+
+.signupButton.active::after {
+    display: none;
+}
+
+.signOutButton {
+    font-family: var(--font-lora);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #5a3e36;
+    font-size: 1rem;
+    transition: color 0.2s;
+    padding: 0.5rem 0;
+}
+
+.signOutButton:hover {
+    color: #a06c45;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .navList {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .navList {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}

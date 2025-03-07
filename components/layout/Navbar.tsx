@@ -1,55 +1,79 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import styles from './navbar.module.css';
+import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
+import styles from '@/styles/navbar.module.css';
 
 export default function Navbar() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+    const pathname = usePathname();
+    const { data: session, status } = useSession();
 
     return (
         <header className={styles.header}>
             <div className={styles.container}>
-                <div className={styles.logo}>
-                    <Link href="/">
-                        <span className={styles.logoText}>Regency Reading Retreat</span>
-                    </Link>
-                </div>
+                <Link href="/" className={styles.logoLink}>
+                    <h1 className={styles.logo}>Regency Reading Retreat</h1>
+                </Link>
 
-                <button
-                    className={styles.mobileMenuButton}
-                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    aria-label="Toggle menu"
-                >
-                    <div className={styles.hamburger}>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </button>
-
-                <nav className={`${styles.nav} ${mobileMenuOpen ? styles.mobileOpen : ''}`}>
-                    <ul className={styles.navLinks}>
-                        <li className={styles.navItem}>
-                            <Link href="/" className={styles.navLink}>
+                <nav className={styles.navigation}>
+                    <ul className={styles.navList}>
+                        <li>
+                            <Link
+                                href="/"
+                                className={pathname === '/' ? styles.active : ''}
+                            >
                                 Home
                             </Link>
                         </li>
-                        <li className={styles.navItem}>
-                            <Link href="/about" className={styles.navLink}>
+                        <li>
+                            <Link
+                                href="/about"
+                                className={pathname === '/about' ? styles.active : ''}
+                            >
                                 About
                             </Link>
                         </li>
-                        <li className={styles.navItem}>
-                            <Link href="/dashboard" className={styles.navLink}>
-                                Dashboard
-                            </Link>
-                        </li>
-                        <li className={styles.navItem}>
-                            <Link href="/signup" className={styles.signupButton}>
-                                Join the Season
-                            </Link>
-                        </li>
+
+                        {status === 'authenticated' ? (
+                            <>
+                                <li>
+                                    <Link
+                                        href="/dashboard"
+                                        className={pathname === '/dashboard' ? styles.active : ''}
+                                    >
+                                        Dashboard
+                                    </Link>
+                                </li>
+                                <li>
+                                    <button
+                                        onClick={() => signOut({ callbackUrl: '/' })}
+                                        className={styles.signOutButton}
+                                    >
+                                        Sign Out
+                                    </button>
+                                </li>
+                            </>
+                        ) : (
+                            <>
+                                <li>
+                                    <Link
+                                        href="/login"
+                                        className={pathname === '/login' ? styles.active : ''}
+                                    >
+                                        Sign In
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        href="/signup"
+                                        className={`${styles.signupButton} ${pathname === '/signup' ? styles.active : ''}`}
+                                    >
+                                        Join
+                                    </Link>
+                                </li>
+                            </>
+                        )}
                     </ul>
                 </nav>
             </div>
