@@ -1,0 +1,806 @@
+/* styles/adminDashboard.module.css */
+.container {
+    min-height: 100vh;
+    padding: 0;
+    font-family: var(--font-lora), serif;
+    background-color: #f9f3e9; /* Consistent with the app's theme */
+    color: #3a3a3a;
+}
+
+.main {
+    padding: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    font-family: var(--font-playfair), serif;
+    font-size: 2.2rem;
+    color: #9b2226;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.header h2 {
+    font-family: var(--font-lora), serif;
+    font-size: 1.5rem;
+    color: #5a3e36;
+    font-weight: normal;
+    font-style: italic;
+}
+
+/* Loading State */
+.loadingState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(155, 34, 38, 0.2);
+    border-radius: 50%;
+    border-top-color: #9b2226;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Tabs Navigation */
+.tabsContainer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e5e5e5;
+    flex-wrap: wrap;
+}
+
+.tabButton {
+    padding: 0.75rem 1.5rem;
+    margin: 0 0.5rem;
+    background: none;
+    border: none;
+    font-family: var(--font-lora), serif;
+    font-size: 1rem;
+    color: #5a3e36;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.tabButton:hover {
+    color: #9b2226;
+}
+
+.activeTab {
+    color: #9b2226;
+    font-weight: 600;
+}
+
+.activeTab::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 20%;
+    width: 60%;
+    height: 3px;
+    background-color: #9b2226;
+}
+
+/* Overview Section */
+.overviewContent {
+    padding: 1rem 0;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.statCard {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.statCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.statCard h3 {
+    font-family: var(--font-lora), serif;
+    color: #5a3e36;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.statValue {
+    font-family: var(--font-playfair), serif;
+    font-size: 2rem;
+    color: #9b2226;
+    margin-bottom: 0.25rem;
+}
+
+.statDetail {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.overviewGridRow {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .overviewGridRow {
+        grid-template-columns: 3fr 2fr;
+    }
+}
+
+/* Team Progress Section */
+.teamProgressSection {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.teamProgressSection h3,
+.topGenresSection h3,
+.recentBooksSection h3,
+.activeScandalsSection h3 {
+    font-family: var(--font-playfair), serif;
+    color: #9b2226;
+    margin-bottom: 1.2rem;
+    font-size: 1.3rem;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 0.75rem;
+}
+
+.teamProgressBar {
+    margin-bottom: 1.5rem;
+}
+
+.teamProgressInfo {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.teamName {
+    font-weight: 600;
+    color: #5a3e36;
+}
+
+.teamProgressValue {
+    color: #5a3e36;
+}
+
+.progressBarContainer {
+    height: 12px;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progressBarFill {
+    height: 100%;
+    background-color: #9b2226;
+    transition: width 0.5s ease;
+}
+
+.teamMeta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Top Genres Section */
+.topGenresSection {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.genreItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.genreRank {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #9b2226;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.genreInfo {
+    width: 120px;
+    margin-right: 1rem;
+}
+
+.genreName {
+    font-weight: 600;
+    color: #5a3e36;
+    text-transform: capitalize;
+    font-size: 0.95rem;
+}
+
+.genreCount {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.genreBar {
+    flex-grow: 1;
+    height: 8px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.genreFill {
+    height: 100%;
+    background-color: #9b2226;
+    transition: width 0.5s ease;
+}
+
+/* Recent Books Section */
+.recentBooksSection {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.recentBooksList {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.recentBookItem {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 0.75rem 0;
+}
+
+.recentBookItem:last-child {
+    border-bottom: none;
+}
+
+.bookInfo h4 {
+    font-family: var(--font-lora), serif;
+    color: #5a3e36;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.bookInfo p {
+    font-style: italic;
+    margin-bottom: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.bookMeta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.bookGenre {
+    background-color: rgba(155, 34, 38, 0.1);
+    color: #9b2226;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    text-transform: capitalize;
+}
+
+.bookDate {
+    color: #666;
+}
+
+.bookReader {
+    font-size: 0.85rem;
+    color: #5a3e36;
+}
+
+/* Active Scandals Section */
+.activeScandalsSection {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.scandalItem {
+    background-color: rgba(155, 34, 38, 0.05);
+    border: 1px solid rgba(155, 34, 38, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.scandalItem h4 {
+    font-family: var(--font-playfair), serif;
+    color: #9b2226;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.scandalDescription {
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.scandalChallenge {
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+.scandalMeta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Teams Tab */
+.teamsContent {
+    padding: 1rem 0;
+}
+
+.teamsContent > h3 {
+    font-family: var(--font-playfair), serif;
+    color: #9b2226;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    text-align: center;
+    font-style: italic;
+}
+
+.teamCardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.teamDetailCard {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.teamDetailCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.teamHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.teamHeader h3 {
+    font-family: var(--font-playfair), serif;
+    color: #9b2226;
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.teamCode {
+    background-color: rgba(155, 34, 38, 0.1);
+    color: #9b2226;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.teamDescription {
+    color: #5a3e36;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.teamStatGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.teamStat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.statLabel {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+}
+
+.statValue {
+    font-family: var(--font-playfair), serif;
+    color: #9b2226;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.teamProgressBarLarge {
+    height: 16px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.teamDetailStats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.detailStat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background-color: rgba(90, 62, 54, 0.05);
+    border-radius: 4px;
+}
+
+.detailLabel {
+    font-size: 0.85rem;
+    color: #5a3e36;
+}
+
+.detailValue {
+    font-weight: 600;
+    color: #5a3e36;
+}
+
+.teamGenres {
+    margin-top: 1.5rem;
+}
+
+.teamGenres h4 {
+    font-family: var(--font-lora), serif;
+    color: #5a3e36;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.genreTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.genreTag {
+    background-color: rgba(155, 34, 38, 0.1);
+    color: #9b2226;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-transform: capitalize;
+}
+
+/* Members Tab */
+.membersContent,
+.booksContent,
+.scandalsContent {
+    padding: 1rem 0;
+}
+
+.membersContent > h3,
+.booksContent > h3,
+.scandalsContent > h3 {
+    font-family: var(--font-playfair), serif;
+    color: #9b2226;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    text-align: center;
+    font-style: italic;
+}
+
+.tableContainer {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+}
+
+.dataTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.dataTable th {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 2px solid #f0f0f0;
+    color: #5a3e36;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.dataTable td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.9rem;
+}
+
+.dataTable tr:hover {
+    background-color: rgba(155, 34, 38, 0.05);
+}
+
+/* Scandals Tab */
+.scandalStatusButtons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+}
+
+.statusButton {
+    background-color: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    color: #5a3e36;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.statusButton:hover, .activeButton {
+    background-color: rgba(155, 34, 38, 0.05);
+    border-color: #9b2226;
+    color: #9b2226;
+}
+
+.activeButton {
+    background-color: rgba(155, 34, 38, 0.1);
+    border-color: #9b2226;
+    font-weight: 600;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+.scandalCardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.scandalCard {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.activeScandal {
+    border-left: 4px solid #9b2226;
+}
+
+.resolvedScandal {
+    border-left: 4px solid #5a3e36;
+    opacity: 0.8;
+}
+
+.scandalCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.scandalCardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.scandalCardHeader h4 {
+    font-family: var(--font-playfair), serif;
+    color: #9b2226;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.activeBadge,
+.resolvedBadge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.activeBadge {
+    background-color: rgba(155, 34, 38, 0.1);
+    color: #9b2226;
+}
+
+.resolvedBadge {
+    background-color: rgba(90, 62, 54, 0.1);
+    color: #5a3e36;
+}
+
+.scandalDescription {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    color: #5a3e36;
+}
+
+.scandalChallenge {
+    background-color: rgba(155, 34, 38, 0.05);
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.scandalMember,
+.scandalTeam {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    color: #5a3e36;
+}
+
+.scandalResolvedMessage {
+    font-style: italic;
+    font-size: 0.85rem;
+    margin-top: 1rem;
+    color: #666;
+    text-align: center;
+}
+
+.resolveButton {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background-color: #9b2226;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.resolveButton:hover {
+    background-color: #7a1a1e;
+}
+
+.emptyState {
+    padding: 2rem;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.8rem;
+    }
+
+    .header h2 {
+        font-size: 1.2rem;
+    }
+
+    .tabButton {
+        padding: 0.6rem 1rem;
+        margin: 0 0.25rem;
+        font-size: 0.9rem;
+    }
+
+    .teamStatGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .statValue {
+        font-size: 1.2rem;
+    }
+
+    .scandalCard {
+        padding: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main {
+        padding: 1rem;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .header h2 {
+        font-size: 1rem;
+    }
+
+    .tabsContainer {
+        margin-bottom: 1.5rem;
+    }
+
+    .tabButton {
+        padding: 0.5rem 0.75rem;
+        margin: 0 0.1rem;
+        font-size: 0.85rem;
+    }
+
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .statValue {
+        font-size: 1.5rem;
+    }
+
+    .teamDetailCard {
+        padding: 1.2rem;
+    }
+
+    .teamHeader h3 {
+        font-size: 1.1rem;
+    }
+
+    .teamStatGrid {
+        grid-template-columns: repeat(2, 1fr);
+        margin-bottom: 1rem;
+    }
+}

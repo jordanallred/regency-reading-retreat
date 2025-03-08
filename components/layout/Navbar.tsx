@@ -1,3 +1,4 @@
+// Update components/layout/Navbar.tsx to include an Admin link for authenticated users
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -79,6 +80,15 @@ export default function Navbar() {
                                         className={pathname === '/dashboard' ? styles.active : ''}
                                     >
                                         Dashboard
+                                    </Link>
+                                </li>
+                                {/* Add Admin link - in a real app, this would be conditionally shown based on admin role */}
+                                <li>
+                                    <Link
+                                        href="/admin"
+                                        className={pathname === '/admin' ? styles.active : ''}
+                                    >
+                                        Admin
                                     </Link>
                                 </li>
                                 <li className={styles.mobileOnly}>
