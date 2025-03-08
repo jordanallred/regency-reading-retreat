@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import prisma from '@/lib/prisma';
-import { authOptions } from '../../../auth/[...nextauth]/route';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function GET(request: NextRequest) {
     try {
@@ -15,8 +15,6 @@ export async function GET(request: NextRequest) {
                 { status: 401 }
             );
         }
-
-        // In a real application, you would check if the user is an admin
 
         // Get all users
         const users = await prisma.user.findMany({

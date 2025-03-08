@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import prisma from '@/lib/prisma';
-import { authOptions } from '../../../../auth/[...nextauth]/route';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function POST(
     request: NextRequest,
@@ -18,8 +18,6 @@ export async function POST(
                 { status: 401 }
             );
         }
-
-        // In a real application, you would check if the user is an admin
 
         const id = params.id;
 
