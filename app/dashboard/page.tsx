@@ -45,6 +45,7 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState('');
+    const [formExpanded, setFormExpanded] = useState(false);
 
     // Form state
     const [bookForm, setBookForm] = useState<BookFormData>({
@@ -158,6 +159,9 @@ export default function Dashboard() {
                 genre: ''
             });
 
+            // Collapse form on successful submission on mobile
+            setFormExpanded(false);
+
             // Refresh book list and team data
             fetchUserData();
 
@@ -189,7 +193,10 @@ export default function Dashboard() {
         return (
             <div className={styles.container}>
                 <div className={styles.main}>
-                    <p>Loading your social season details...</p>
+                    <div className={styles.loadingState}>
+                        <div className={styles.spinner}></div>
+                        <p>Loading your social season details...</p>
+                    </div>
                 </div>
             </div>
         );
@@ -222,7 +229,7 @@ export default function Dashboard() {
                 <div className={styles.header}>
                     <h1>Welcome to the Season, {session.user.name}</h1>
                     {team && (
-                        <div>
+                        <div className={styles.teamBadge}>
                             Member of <span>{team.name}</span>
                         </div>
                     )}
@@ -231,7 +238,7 @@ export default function Dashboard() {
                 <div className={styles.dashboardGrid}>
                     <section className={styles.teamProgress}>
                         <h2>Your Reading Progress</h2>
-                        <div>
+                        <div className={styles.progressContent}>
                             <p>Books Read: {books.length}</p>
                             {team && (
                                 <>
@@ -250,9 +257,19 @@ export default function Dashboard() {
                     <section className={styles.readingLog}>
                         <h2>Your Reading Card</h2>
 
-                        <form className={styles.addBookForm} onSubmit={handleAddBook}>
-                            {formError && <div className={styles.error}>{formError}</div>}
-                            <div className={styles.formGrid}>
+                        <div className={styles.formToggle}>
+                            <button
+                                className={`${styles.toggleButton} ${formExpanded ? styles.active : ''}`}
+                                onClick={() => setFormExpanded(!formExpanded)}
+                                aria-expanded={formExpanded}
+                            >
+                                {formExpanded ? 'Hide Form' : 'Add New Book'}
+                            </button>
+                        </div>
+
+                        {formExpanded && (
+                            <form className={styles.addBookForm} onSubmit={handleAddBook}>
+                                {formError && <div className={styles.error}>{formError}</div>}
                                 <div className={styles.formGroup}>
                                     <label htmlFor="title">Book Title</label>
                                     <input
@@ -277,44 +294,46 @@ export default function Dashboard() {
                                         required
                                     />
                                 </div>
-                                <div className={styles.formGroup}>
-                                    <label htmlFor="pages">Pages</label>
-                                    <input
-                                        type="number"
-                                        id="pages"
-                                        name="pages"
-                                        placeholder="279"
-                                        value={bookForm.pages}
-                                        onChange={handleInputChange}
-                                    />
+                                <div className={styles.formRow}>
+                                    <div className={styles.formGroup}>
+                                        <label htmlFor="pages">Pages</label>
+                                        <input
+                                            type="number"
+                                            id="pages"
+                                            name="pages"
+                                            placeholder="279"
+                                            value={bookForm.pages}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <div className={styles.formGroup}>
+                                        <label htmlFor="genre">Genre</label>
+                                        <select
+                                            id="genre"
+                                            name="genre"
+                                            value={bookForm.genre}
+                                            onChange={handleInputChange}
+                                        >
+                                            <option value="">Select...</option>
+                                            <option value="classic">Classic</option>
+                                            <option value="romance">Romance</option>
+                                            <option value="historical">Historical</option>
+                                            <option value="gothic">Gothic</option>
+                                            <option value="poetry">Poetry</option>
+                                            <option value="drama">Drama</option>
+                                            <option value="non-fiction">Non-Fiction</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div className={styles.formGroup}>
-                                    <label htmlFor="genre">Genre</label>
-                                    <select
-                                        id="genre"
-                                        name="genre"
-                                        value={bookForm.genre}
-                                        onChange={handleInputChange}
-                                    >
-                                        <option value="">Select a genre...</option>
-                                        <option value="classic">Classic</option>
-                                        <option value="romance">Romance</option>
-                                        <option value="historical">Historical</option>
-                                        <option value="gothic">Gothic</option>
-                                        <option value="poetry">Poetry</option>
-                                        <option value="drama">Drama</option>
-                                        <option value="non-fiction">Non-Fiction</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button
-                                className={styles.addButton}
-                                type="submit"
-                                disabled={submitting}
-                            >
-                                {submitting ? 'Adding...' : 'Add to Reading Card'}
-                            </button>
-                        </form>
+                                <button
+                                    className={styles.addButton}
+                                    type="submit"
+                                    disabled={submitting}
+                                >
+                                    {submitting ? 'Adding...' : 'Add to Reading Card'}
+                                </button>
+                            </form>
+                        )}
 
                         {books.length === 0 ? (
                             <div className={styles.emptyState}>
@@ -330,8 +349,13 @@ export default function Dashboard() {
                                             <div className={styles.bookTitle}>{book.title}</div>
                                             <div className={styles.bookAuthor}>by {book.author}</div>
                                             <div className={styles.bookDetails}>
-                                                Genre: {book.genre} | {book.pages} pages |
-                                                Finished: {new Date(book.dateFinished).toLocaleDateString()}
+                                                <span className={styles.bookGenre}>{book.genre}</span>
+                                                <span className={styles.bookSeparator}>•</span>
+                                                <span className={styles.bookPages}>{book.pages} pages</span>
+                                                <span className={styles.bookSeparator}>•</span>
+                                                <span className={styles.bookDate}>
+                                                    {new Date(book.dateFinished).toLocaleDateString()}
+                                                </span>
                                             </div>
                                         </li>
                                     ))}
@@ -343,7 +367,7 @@ export default function Dashboard() {
                     {team && (
                         <section className={styles.leaderboard}>
                             <h2>Society Updates</h2>
-                            <div>
+                            <div className={styles.societyCard}>
                                 <h3>{team.name}</h3>
                                 <p>{team.description}</p>
                                 <div className={styles.progressBar}>
@@ -352,7 +376,7 @@ export default function Dashboard() {
                                         style={{ width: `${Math.min(100, (team.progress / team.goal) * 100)}%` }}
                                     ></div>
                                 </div>
-                                <p>{team.progress} / {team.goal} books read</p>
+                                <p className={styles.societyProgress}>{team.progress} / {team.goal} books read</p>
                             </div>
                         </section>
                     )}

@@ -1,18 +1,85 @@
-html,
+/* app/globals.css */
+@import "tailwindcss";
+
+:root {
+    --background: #ffffff;
+    --foreground: #171717;
+    --primary: #a06c45;
+    --primary-dark: #8a5a3b;
+    --accent: #9b2226;
+    --accent-dark: #7a1a1e;
+    --light-bg: #f9f3e9;
+    --card-bg: #ffffff;
+    --border-color: #e5e5e5;
+    --text-primary: #5a3e36;
+    --text-secondary: #3a3a3a;
+    --text-muted: #6c6c6c;
+    --success: #2e7d32;
+    --error: #d32f2f;
+
+    /* Animation variables */
+    --transition-slow: 0.5s ease;
+    --transition-medium: 0.3s ease;
+    --transition-fast: 0.2s ease;
+
+    /* Spacing variables */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-xxl: 3rem;
+
+    /* Layout variables */
+    --container-width: 1200px;
+    --navbar-height: 70px;
+}
+
+/* No dark mode support - using consistent Regency theme */
+
+html {
+    scroll-behavior: smooth;
+}
+
 body {
-    padding: 0;
-    margin: 0;
-    font-family: 'Lora', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    background: #f9f3e9;
+    color: #3a3a3a;
+    font-family: var(--font-lora), Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+    font-size: 16px;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-playfair), serif;
+    line-height: 1.2;
+    color: #5a3e36;
 }
 
 a {
-    color: inherit;
+    color: #a06c45;
     text-decoration: none;
+    transition: color 0.2s ease;
 }
 
-* {
-    box-sizing: border-box;
+a:hover {
+    color: #8a5a3b;
+}
+
+button {
+    cursor: pointer;
+}
+
+input, select, textarea, button {
+    font-family: inherit;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #a06c45 !important;
+    box-shadow: 0 0 0 2px rgba(160, 108, 69, 0.2);
 }
 
 /* Custom scrollbar */
@@ -22,13 +89,80 @@ a {
 
 ::-webkit-scrollbar-track {
     background: #f1f1f1;
+    border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #9b2226;
-    border-radius: 4px;
+    background: #a06c45;
+    border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #7a1a1e;
+    background: #8a5a3b;
+}
+
+/* Container for consistent spacing */
+.container {
+    width: 100%;
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
+}
+
+/* Utility classes */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+    body {
+        font-size: 15px;
+    }
+
+    h1 {
+        font-size: 2.2rem;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+    }
+
+    .container {
+        padding: 0 var(--spacing-md);
+    }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.3rem;
+    }
+
+    .container {
+        padding: 0 var(--spacing-md);
+    }
 }

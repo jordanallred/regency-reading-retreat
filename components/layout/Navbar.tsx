@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
@@ -8,15 +9,50 @@ import styles from '@/styles/navbar.module.css';
 export default function Navbar() {
     const pathname = usePathname();
     const { data: session, status } = useSession();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+
+    // Handle scroll effect for navbar
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+    // Close menu when route changes
+    useEffect(() => {
+        setIsMenuOpen(false);
+    }, [pathname]);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
 
     return (
-        <header className={styles.header}>
+        <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
             <div className={styles.container}>
-                <Link href="/" className={styles.logoLink}>
-                    <h1 className={styles.logo}>Regency Reading Retreat</h1>
-                </Link>
+                <div className={styles.logoContainer}>
+                    <Link href="/" className={styles.logoLink}>
+                        <h1 className={styles.logo}>Regency Reading Retreat</h1>
+                    </Link>
 
-                <nav className={styles.navigation}>
+                    <button
+                        className={`${styles.menuButton} ${isMenuOpen ? styles.menuOpen : ''}`}
+                        onClick={toggleMenu}
+                        aria-label="Toggle menu"
+                    >
+                        <span className={styles.menuBar}></span>
+                        <span className={styles.menuBar}></span>
+                        <span className={styles.menuBar}></span>
+                    </button>
+                </div>
+
+                <nav className={`${styles.navigation} ${isMenuOpen ? styles.mobileOpen : ''}`}>
                     <ul className={styles.navList}>
                         <li>
                             <Link
@@ -45,7 +81,10 @@ export default function Navbar() {
                                         Dashboard
                                     </Link>
                                 </li>
-                                <li>
+                                <li className={styles.mobileOnly}>
+                                    <span className={styles.userName}>{session?.user?.name}</span>
+                                </li>
+                                <li className={styles.navButton}>
                                     <button
                                         onClick={() => signOut({ callbackUrl: '/' })}
                                         className={`${styles.signupButton} ${styles.signOutButton}`}
@@ -64,7 +103,7 @@ export default function Navbar() {
                                         Sign In
                                     </Link>
                                 </li>
-                                <li>
+                                <li className={styles.navButton}>
                                     <Link
                                         href="/signup"
                                         className={`${styles.signupButton} ${pathname === '/signup' ? styles.active : ''}`}

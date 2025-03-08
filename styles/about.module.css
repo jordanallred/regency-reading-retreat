@@ -89,3 +89,45 @@
         text-align: center;
     }
 }
+
+/* about.module.css improvements */
+@media (max-width: 768px) {
+    .main {
+        padding: 3rem 1.5rem;
+    }
+
+    .title {
+        font-size: 2.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .section {
+        margin-bottom: 2rem;
+    }
+
+    .section h2 {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .section p {
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    .rules {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .hostImage {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 2rem;
+    }
+}

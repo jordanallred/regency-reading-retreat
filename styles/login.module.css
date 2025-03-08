@@ -108,3 +108,25 @@
         padding: 1.5rem;
     }
 }
+
+/* login.module.css improvements */
+@media (max-width: 600px) {
+    .main {
+        padding: 1.25rem;
+        margin: 1rem;
+    }
+
+    .submitButton {
+        padding: 0.875rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 1.75rem;
+    }
+
+    .loginForm {
+        gap: 1.25rem;
+    }
+}

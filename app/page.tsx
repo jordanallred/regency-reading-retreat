@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
       <div className={styles.container}>
-        <div className={styles.hero}>
+        <div className={`${styles.hero} ${styles.heroFallback}`}>
           <h1 className={styles.title}>Regency Reading Retreat</h1>
           <p className={styles.description}>
             A most delightful reading challenge where propriety and literature shall meet
@@ -84,7 +84,7 @@ export default function Home() {
         </section>
 
         <footer className={styles.footer}>
-          <p>Hosted by BookTube Channel: [Channel Name]</p>
+          <p>&copy; {new Date().getFullYear()} Regency Reading Retreat</p>
         </footer>
       </div>
   );

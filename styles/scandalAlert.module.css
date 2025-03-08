@@ -74,3 +74,54 @@
 .acceptButton:hover {
     background-color: #7a1a1e;
 }
+
+/* scandalAlert.module.css improvements */
+@media (max-width: 600px) {
+    .scandalContent {
+        padding: 1.5rem;
+        width: 95%;
+    }
+
+    .scandalHeader h2 {
+        font-size: 1.5rem;
+    }
+
+    .closeButton {
+        font-size: 1.25rem;
+    }
+}
+
+/* Add these smooth animations for better user experience */
+@media (max-width: 768px) {
+    /* Smooth transitions for buttons */
+    .primaryButton,
+    .secondaryButton,
+    .signupButton,
+    .submitButton,
+    .addButton,
+    .closeButton,
+    .acceptButton {
+        transition: all 0.3s ease;
+    }
+
+    /* Improved touch feedback */
+    .primaryButton:active,
+    .secondaryButton:active,
+    .signupButton:active,
+    .submitButton:active,
+    .addButton:active {
+        transform: scale(0.98);
+    }
+
+    /* Smoother transitions for cards */
+    .teamCard,
+    .ruleItem,
+    .rule {
+        transition: all 0.3s ease;
+    }
+
+    /* Improved loading states */
+    .submitButton:disabled {
+        opacity: 0.7;
+    }
+}
